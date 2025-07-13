@@ -1,0 +1,66 @@
+1. System Preparation
+
+sudo apt-get update                          # Update package index
+sudo apt-get dist-upgrade                   # Upgrade installed packages
+sudo apt install -y python3 python3-pip     # Install Python 3 and pip
+sudo apt install -y python3-venv            # Install virtualenv module for Python
+sudo apt install -y apt-transport-https     # For Elasticsearch repo support
+
+2. Create and Activate Virtual Environment
+
+python3 -m venv ~/rbcapp-monitoring-env     # Create virtual environment
+source ~/rbcapp-monitoring-env/bin/activate # Activate virtual environment
+
+3. Install Required Python Libraries
+
+pip install flask elasticsearch requests pandas  # For REST API and Elasticsearch integration
+
+4. Install and Setup Services
+
+sudo apt install -y apache2 rabbitmq-server postgresql  # Required backend services for rbcapp1
+
+5. Install and Configure Elasticsearch
+
+sudo apt install -y openjdk-17-jdk                         # Java dependency for Elasticsearch
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-7.x.list
+sudo apt update
+sudo apt install -y elasticsearch
+sudo systemctl enable elasticsearch
+sudo systemctl start elasticsearch
+curl http://localhost:9200                                # Verify ES is running
+
+6. Test Your Python Monitoring App
+
+python3 monitor.py                                        # Runs the script to monitor and log service status
+python3 app.py                                            # Starts Flask REST API for /add, /healthcheck
+
+7. Use curl to Interact with REST API
+
+curl -X POST http://localhost:5000/add -F "file=@filename.json"    # Send service status to ES
+curl http://localhost:5000/healthcheck                             # Check overall status
+curl http://localhost:5000/healthcheck/httpd                       # Check specific service status
+
+8. CSV Analysis with Pandas
+
+pip install pandas                                                 # Install pandas if not already
+python3 filter.py                                                  # Run script to filter based on price per sqft
+cat properties_below_avg_price_per_sqft.csv                        # View output
+cp properties_below_avg_price_per_sqft.csv /tmp/output.csv
+chown ubuntu:ubuntu /tmp/output.csv                                # Adjust file permissions
+
+9. Ansible Setup (for TEST2)
+
+sudo apt install -y ansible                                        # Install Ansible
+ansible-galaxy collection install community.general                # For email module
+
+10. Email Setup (for Disk Alert)
+
+# For Gmail SMTP alerts (uses App Password)
+# Include in your playbook:
+# - community.general.mail
+
+11. Optional: Service Control Commands
+
+sudo systemctl stop apache2 rabbitmq-server postgresql           # Stop services for test
+sudo systemctl status elasticsearch                              # Check Elasticsearch status
