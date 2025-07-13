@@ -1,5 +1,5 @@
 
-# 🔍 RBCApp1 Monitoring & Data Processing Project
+# RBCApp1 Monitoring & Data Processing Project
 
 This repository contains three key tasks:
 
@@ -9,7 +9,7 @@ This repository contains three key tasks:
 
 ---
 
-## 📁 Contents
+## Contents
 
 ```
 .
@@ -19,7 +19,8 @@ This repository contains three key tasks:
 ├── inventory                   # Ansible inventory for multi-host monitoring
 ├── filter.py                   # CSV filter script for real estate data
 ├── output.csv                  # Output CSV from filter.py
-└── README.md                   # This documentation
+├── README.md                   # This documentation
+└── Commands & screenshots.docs # command reference and screenshot proof
 ```
 
 ---
@@ -159,6 +160,7 @@ community.general.mail:
 ```
 
 Use App Passwords (not your Gmail login). Generate here: https://myaccount.google.com/apppasswords
+we can pass the password as argument, variable or we can encrypt the playbook using vault for the security.
 
 ```bash
 ansible-playbook playbook.yml -i inventory -e action=check-disk
@@ -198,6 +200,7 @@ python3 filter.py
 
 
 ## Sample Commands Summary
+
 
 ```bash
 python3 monitor.py                       # Monitor service status to JSON
