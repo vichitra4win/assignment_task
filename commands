@@ -13,7 +13,7 @@ source ~/rbcapp-monitoring-env/bin/activate # Activate virtual environment
 
 3. Install Required Python Libraries
 
-pip install flask elasticsearch requests pandas  # For REST API and Elasticsearch integration
+pip3 install flask elasticsearch requests pandas  # For REST API and Elasticsearch integration
 
 4. Install and Setup Services
 

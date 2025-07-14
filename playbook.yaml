@@ -19,7 +19,19 @@
           state: present
           update_cache: yes
         when: "'httpd' in group_names"
+      - name: Ensure PostgreSQL is installed on host (Ubuntu)
+        apt:
+          name: postgresql
+            state: present
+            update_cache: yes
+        when: "'postgresql' in group_names"
 
+      - name: Ensure RabbitMQ is installed on host (Ubuntu)
+          apt:
+            name: rabbitmq-server
+            state: present
+            update_cache: yes
+          when: "'rabbitmq' in group_names"
   - name: "=== Action: check-disk ==="
     when: action == "check-disk"
     block:
