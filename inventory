@@ -1,0 +1,11 @@
+[httpd]
+host1 ansible_host=ip
+
+[rabbitmq]
+host2 ansible_host=ip
+
+[postgresql]
+host3 ansible_host=ip
+
+[all:vars]
+ansible_connection=local

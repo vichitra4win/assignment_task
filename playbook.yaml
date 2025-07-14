@@ -1,0 +1,80 @@
+---
+- name: RBCApp1 Monitoring Playbook
+  hosts: all
+  gather_facts: yes
+  vars:
+    alert_email: vichitra4win@gmail.com
+    rest_api_base: http://127.0.0.1:5000
+    gmail_user: "vichitra4win@gmail.com"
+    gmail_app_password: ""  # Replace with your Gmail App Password or use Vault
+
+  tasks:
+
+  - name: "=== Action: verify_install ==="
+    when: action == "verify_install"
+    block:
+      - name: Ensure Apache2 is installed on host1 (Ubuntu)
+        apt:
+          name: apache2
+          state: present
+          update_cache: yes
+        when: "'httpd' in group_names"
+      - name: Ensure PostgreSQL is installed on host (Ubuntu)
+        apt:
+          name: postgresql
+            state: present
+            update_cache: yes
+        when: "'postgresql' in group_names"
+
+      - name: Ensure RabbitMQ is installed on host (Ubuntu)
+          apt:
+            name: rabbitmq-server
+            state: present
+            update_cache: yes
+          when: "'rabbitmq' in group_names"
+  - name: "=== Action: check-disk ==="
+    when: action == "check-disk"
+    block:
+      - name: Check for disk partitions over 80% usage
+        shell: |
+          df -h --output=pcent,target | tail -n +2 | tr -d '%' | awk '$1 > 80 {print $0}'
+        register: disk_alert
+
+      - name: Debug disk output (optional)
+        debug:
+          msg: "{{ disk_alert.stdout_lines }}"
+
+      - name: Send alert email using Gmail SMTP
+        community.general.mail:
+          host: smtp.gmail.com
+          port: 587
+          username: "{{ gmail_user }}"
+          password: "{{ gmail_app_password }}"
+          to: "{{ alert_email }}"
+          subject: "Disk Usage Alert on {{ inventory_hostname }}"
+          body: |
+            Hello Vichitra,
+
+            Disk usage on {{ inventory_hostname }} has exceeded 80%.
+
+            Details:
+            {{ disk_alert.stdout }}
+
+            Regards,
+            Ansible Monitor
+          secure: starttls
+        when: disk_alert.stdout != ""
+
+  - name: "=== Action: check-status ==="
+    when: action == "check-status"
+    block:
+      - name: Call healthcheck API for app status
+        uri:
+          url: "{{ rest_api_base }}/healthcheck"
+          method: GET
+          return_content: yes
+        register: api_response
+
+      - name: Display RBCApp1 health status
+        debug:
+          msg: "RBCApp1 Status: {{ api_response.json.status }}"
